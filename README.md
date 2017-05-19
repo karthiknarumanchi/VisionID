@@ -3,17 +3,10 @@
 This project uses Google's TensorFlow Machine Learning library for image recognition using the Inception model to classify images.
 Images can be both captured or chosen from the device for recognition.
 
-The project is work in progress.
-
 ## Pre-requisites
 
 * Android 5.0 Lollipop(API 21) or higher.
 * JNI Files have to be compiled from the TensorFlow source by using Bazel. After the files have been compiled,place the '.so' files in a folder named 'jniLibs' in 'VisionID/src/main/'.
-
-## Building
-
-To build, follow steps here in the TensorFlow android demo application source:
-https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android
 
 ## License
 
