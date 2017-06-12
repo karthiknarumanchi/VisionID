@@ -6,3 +6,5 @@
 VisionID/VisionID.iml
 
 VisionID/gradle/
+
+.gitignore
