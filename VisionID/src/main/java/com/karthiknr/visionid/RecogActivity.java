@@ -116,7 +116,7 @@ public class RecogActivity {
     Log.v(TAG,""+ results.size()+" results");
     for (final Classifier.Recognition result : results) {
       String finalresult=result.getTitle();
-      Log.v(TAG,"Result: " + finalresult+"");
+      Log.v(TAG,"Result: " + finalresult + result.getConfidence() * 100 + "");
     }
       MainActivity.SetText(results);
       MainActivity.SetImage(bmp);

@@ -15,6 +15,7 @@ limitations under the License.
 
 package com.karthiknr.visionid;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +33,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,8 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     public static final String PATH = Environment.getExternalStorageDirectory().toString() + "/VisionID/";
 
@@ -50,7 +51,13 @@ public class MainActivity extends AppCompatActivity
     protected static TextView _field;
     protected static ImageView _image;
 
+    protected Button shutter_button;
+    protected Button gallery_button;
+
     protected String _path;
+    protected static final String PHOTO_TAKEN = "photo_taken";
+    protected boolean _taken;
+
 
     protected static ProgressDialog progress;
 
@@ -63,22 +70,16 @@ public class MainActivity extends AppCompatActivity
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.main);
 
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        _field = (TextView) findViewById(R.id.field);
+        _field = (TextView) findViewById(R.id.textView);
         _image = (ImageView) findViewById(R.id.imageView);
+
+        shutter_button = (Button) findViewById(R.id.shutter_button);
+        gallery_button = (Button) findViewById(R.id.gallery_button);
+
+        shutter_button.setOnClickListener(this);
+        gallery_button.setOnClickListener(this);
 
         progress = new ProgressDialog(this);
         progress.setTitle("Please Wait");
@@ -88,50 +89,26 @@ public class MainActivity extends AppCompatActivity
         _path = PATH + "/img.jpg";
     }
 
-    @Override
+    /*@Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+        super.onBackPressed();
+    }*/
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-            Log.v(TAG, "Starting Camera");
-            if(_image.getVisibility()== View.VISIBLE) {
-                _image.setVisibility(View.INVISIBLE);
-            }
+    public void onClick(View v) {
+        if(v == shutter_button) {
             _field.setText("");
+            _image.setVisibility(View.INVISIBLE);
+            Log.v(TAG, "Starting Camera app");
             startCameraActivity();
-        } else if (id == R.id.nav_gallery) {
-            Log.v(TAG, "Starting Image Chooser");
-            if(_image.getVisibility()== View.VISIBLE) {
-                _image.setVisibility(View.INVISIBLE);
-            }
+        }
+        if(v == gallery_button) {
             _field.setText("");
+            _image.setVisibility(View.INVISIBLE);
+            Log.v(TAG, "Starting Gallery Activity");
             startGalleryActivity();
-        } else if (id == R.id.nav_info) {
-            Toast.makeText(getApplicationContext(), "Karthik Narumanchi,2016", Toast.LENGTH_SHORT).show();
         }
-        else if(id == R.id.nav_gh)
-        {
-            Uri uri = Uri.parse("https://github.com/karthiknr/VisionID");
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(intent);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        //Toast.makeText(getApplicationContext(), "Karthik Narumanchi,2016", Toast.LENGTH_SHORT).show();
     }
 
     /*
@@ -176,6 +153,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(MainActivity.PHOTO_TAKEN, _taken);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.i(TAG, "onRestoreInstanceState()");
+        if (savedInstanceState.getBoolean(MainActivity.PHOTO_TAKEN)) {
+            _taken = true;
+            onPhotoTaken();
+        }
+    }
+
     protected void onPhotoChosen(Intent data) {
         Uri uri = data.getData();
         try {
@@ -203,7 +194,8 @@ public class MainActivity extends AppCompatActivity
             if(_field.getText().toString().length() ==0)
             {
                 for (final Classifier.Recognition recog : results) {
-                    br.append(recog.getTitle() + ": " + recog.getConfidence() * 100 + "\n");
+                    br.append(recog.getTitle().toUpperCase() + "\n");
+                    break;
                 }
                 _field.setText(br.toString());
                 Log.v(TAG, "Text Set to Field");
