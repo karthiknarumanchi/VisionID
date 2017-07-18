@@ -3,7 +3,7 @@
 This project uses Google's TensorFlow Machine Learning library for image recognition using the Inception model to classify images.
 Images can be both captured or chosen from the device for recognition.
 
-![alt text](/screens/Screenshot.png?raw=true "Screenshot")
+![alt text](/Screenshot.png?raw=true "Screenshot")
 
 ## Pre-requisites
 
